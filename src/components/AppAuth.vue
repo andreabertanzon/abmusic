@@ -54,24 +54,35 @@
           </ul>
 
           <!-- Login Form -->
-          <form v-show="tab === 'login'">
+          <div
+            class="text-white text-center font-bold p4 rounded mb-4"
+            v-if="loginShowAlert"
+            :class="loginAlertVariant"
+          >
+            {{ loginMessage }}
+          </div>
+          <vee-form v-show="tab === 'login'" :validation-schema="loginSchema" @submit="login">
             <!-- Email -->
             <div class="mb-3">
               <label class="inline-block mb-2">Email</label>
-              <input
+              <vee-field
+                name="email"
                 type="email"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email"
               />
+              <ErrorMessage class="text-red-600" name="email" />
             </div>
             <!-- Password -->
             <div class="mb-3">
               <label class="inline-block mb-2">Password</label>
-              <input
+              <vee-field
+                name="password"
                 type="password"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Password"
               />
+              <ErrorMessage class="text-red-600" name="password" />
             </div>
             <button
               type="submit"
@@ -79,9 +90,21 @@
             >
               Submit
             </button>
-          </form>
+          </vee-form>
           <!-- Registration Form -->
-          <vee-form v-show="tab === 'register'" :validation-schema="schema" @submit="register">
+          <div
+            class="text-white text-center font-bold p4 rounded mb-4"
+            v-if="regShowAlert"
+            :class="regAlertVariant"
+          >
+            {{ regAlertMsg }}
+          </div>
+          <vee-form
+            v-show="tab === 'register'"
+            :validation-schema="schema"
+            @submit="register"
+            :initial-values="userData"
+          >
             <!-- Name -->
             <div class="mb-3">
               <label class="inline-block mb-2">Name</label>
@@ -117,13 +140,17 @@
             <!-- Password -->
             <div class="mb-3">
               <label class="inline-block mb-2">Password</label>
-              <vee-field
-                name="password"
-                type="password"
-                class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-                placeholder="Password"
-              />
-              <ErrorMessage class="text-red-600" name="password" />
+              <vee-field name="password" :bails="false" v-slot="{ field, errors }">
+                <input
+                  type="password"
+                  class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+                  placeholder="Password"
+                  v-bind="field"
+                />
+                <div class="text-red-600" v-for="error in errors" :key="error">
+                  {{ error }}
+                </div>
+              </vee-field>
             </div>
             <!-- Confirm Password -->
             <div class="mb-3">
@@ -133,7 +160,8 @@
                 type="password"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Confirm Password"
-              />
+              >
+              </vee-field>
               <ErrorMessage class="text-red-600" name="confirm_password" />
             </div>
             <!-- Country -->
@@ -145,7 +173,7 @@
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
               >
                 <option value="USA">USA</option>
-                <option value="Mexico">Italy</option>
+                <option value="Italy">Italy</option>
                 <option value="Germany">Germany</option>
               </vee-field>
               <ErrorMessage class="text-red-600" name="country" />
@@ -162,6 +190,7 @@
               <ErrorMessage class="text-red-600" name="tos" />
             </div>
             <button
+              :disabled="regInSubmission"
               type="submit"
               class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700"
             >
@@ -188,11 +217,26 @@ export default {
         name: 'required|min:3|max:100|alpha_spaces',
         email: 'required|min:3|max:100|email',
         age: 'required|min_value:18|max_value:100',
-        password: 'required|min:3|max:100',
-        confirm_password: 'required|confirmed:@password',
-        country: 'required',
-        tos: 'required'
-      }
+        password: 'required|min:9|max:100|excluded:password',
+        confirm_password: 'required|passwords_mismatch:@password',
+        country: 'required|country_excluded:Germany',
+        tos: 'tos'
+      },
+      loginSchema: {
+        email: 'required|email',
+        password: 'required'
+      },
+      userData: {
+        country: 'USA'
+      },
+      regInSubmission: false,
+      regShowAlert: false,
+      regAlertVariant: 'bg-blue-500',
+      regAlertMsg: "Please wait! you're account is being created",
+      loginShowAlert: false,
+      loginInSubmission: false,
+      loginMessage: 'Please wait while we log you in',
+      loginAlertVariant: 'bg-blue-500'
     }
   },
   computed: {
@@ -204,6 +248,22 @@ export default {
   components: { ErrorMessage },
   methods: {
     register(values) {
+      this.regShowAlert = true
+      this.regInSubmission = true
+      this.regAlertMsg = 'bg-blue-500'
+      this.regAlertMsg = "Please wait! you're account is being created"
+
+      this.regAlertVariant = 'bg-green-500'
+      this.regAlertMsg = 'Success! Your account has been created'
+      console.log(values)
+    },
+    login(values) {
+      this.loginShowAlert = true
+      this.loginInSubmission = true
+      this.loginAlertVariant = 'bg-blue-500'
+
+      this.loginAlertVariant = 'bg-green-500'
+      this.loginMessage = 'Successfully Logged in!'
       console.log(values)
     }
   }
