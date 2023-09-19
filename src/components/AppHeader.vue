@@ -14,7 +14,7 @@
         <!-- Primary Navigation -->
         <ul class="flex flex-row mt-1">
           <li>
-            <RouterLink class="px-2 text-white" :to="{ name: 'home' }">About</RouterLink>
+            <RouterLink class="px-2 text-white" :to="{ name: 'about' }">About</RouterLink>
           </li>
           <!-- Navigation Links -->
           <li v-if="!userStore.userLoggedIn">
@@ -27,7 +27,7 @@
               <RouterLink class="px-2 text-white" :to="{ name: 'manage' }">Manage</RouterLink>
             </li>
             <li>
-              <a class="px-2 text-white" href="#" @click.prevent="userStore.signOut">Logout</a>
+              <a class="px-2 text-white" href="#" @click.prevent="signOut">Logout</a>
             </li>
           </template>
         </ul>
@@ -50,6 +50,13 @@ export default {
     toggleAuthModal() {
       this.modalStore.isOpen = !this.modalStore.isOpen
       console.log(this.modalStore.isOpen)
+    },
+    signOut() {
+      this.userStore.signOut()
+      // if (this.$route.name === 'manage') { // not scalable at all
+      if (this.$route.meta.requiresAuth) {
+        this.$router.push({ name: 'home' })
+      }
     }
   }
 }

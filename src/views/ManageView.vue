@@ -135,3 +135,19 @@
     </div>
   </section>
 </template>
+
+<script>
+// import useUserStore from '../stores/user'
+export default {
+  name: 'ManageView'
+  // beforeRouteEnter(to, from, next) {
+  //   const store = useUserStore()
+  //   //console.log('beforeRouteEnter Guard')
+  //   if (!store.userLoggedIn) {
+  //     next({ name: 'home' })
+  //   } else {
+  //     next()
+  //   }
+  // },
+}
+</script>
